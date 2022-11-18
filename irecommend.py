@@ -5,7 +5,7 @@ from fake_useragent import UserAgent
 
 ua = UserAgent()
 headers = "'" + ua.random + "'"
-user_query = 'велосипед stels'       
+user_query = input('Введите название товара: ')     
 url_query = user_query.replace(' ', '%20')                     
 url2 = ''.join(['https://irecommend.ru/srch?query=', url_query])
 html2 = requests.get(url2, headers={'User-agent': headers}, timeout=10)
