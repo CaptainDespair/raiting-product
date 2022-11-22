@@ -1,6 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 from fake_useragent import UserAgent
+from threading import Thread
 
 
 def search_pattern(url, user_query):     
@@ -17,14 +18,23 @@ def get_html(new_url):
 
 
 def html_data(html):
-    try:
+   # try:
         soup = BeautifulSoup(html.text, 'lxml')
-        title = soup.find("div", {"class":'title'}).text
-        raiting = soup.find(class_="average-rating").find('span').text
-        votes = soup.find(class_ = "read-all-reviews-link").find(class_ ="counter").text
-        return f'Название: {title} \nОценка: {raiting} \nГолосов: {votes}'
-    except:
-        return ('Error!')
+        def titles():
+            for titles in soup.find_all("div", {"class":'title'}):
+                print(titles.text)
+        def raitings():
+            for raitings in soup.find_all(class_="average-rating"):
+                print(raitings.text)
+        def votes():
+            for votes in soup.find_all(class_ = "read-all-reviews-link"):
+                print(votes.text)
+        
+        return titles(), raitings(), votes()
+    
+    #except:
+     #   return ('Error!')
+    
 
 def main():
     url = 'https://irecommend.ru/srch?query='
