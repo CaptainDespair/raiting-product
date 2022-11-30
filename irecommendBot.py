@@ -3,6 +3,7 @@ import requests
 import time
 from bs4 import BeautifulSoup
 from fake_useragent import UserAgent
+import settings
 
 
 def search_pattern(url, user_query):     
@@ -34,16 +35,20 @@ def html_data(html):
             s += f'Название: {title.text}\nОценка: {raitings.text}\nГолосов: {votes.text}\n\n'
         exec_time = round((time.time() - start_time), 4) 
         res = '≥ 15' if counter >= 15 else counter  
-        return f'\n{s}\n-----------------------\nНайдено результатов {res}\n({exec_time}) сек.'
+        return f'\n{s}\n----------------------------\nНайдено результатов {res}\n({exec_time}) сек.'
     except:
         print("Возникла ошибка.")
 
 
-bot = telebot.TeleBot(token)
-@bot.message_handler(content_types=['text', 'document', 'audio'])
+token = settings.proxy
 
-def main(message):
+bot = telebot.TeleBot(token)
+@bot.message_handler(content_types=['text'])
+
+
+def get_message(message):
     url = 'https://irecommend.ru/srch?query='
+    html = get_html(search_pattern(url, message.text))
     if message.text == 'привет':
         bot.send_message(message.from_user.id, 'Привет, напиши название товара')
     elif message.text == '/help':
@@ -51,10 +56,18 @@ def main(message):
     elif message.text == '/start':
         bot.send_message(message.from_user.id, 'Привет, напиши название товара')
     else:
-        bot.send_message(message.from_user.id, f'По запросу "{message.text}" нашлось:\n {html_data(get_html((search_pattern(url, message.text))))}')
+        bot.send_message(message.from_user.id, f'По запросу "{message.text}" нашлось:\n {html_data(html)}')
 
 
-bot.polling(none_stop=True, interval=0)
+def main():
+    bot.polling(none_stop=True, interval=0)
+
+
+if __name__ == "__main__":
+    main()
+    
+
+
 
 
     
