@@ -12,3 +12,4 @@ fake-useragent = "*"
 
 [requires]
 python_version = "3.9"
+ 

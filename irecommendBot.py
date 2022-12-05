@@ -1,46 +1,43 @@
 import telebot 
 import requests
 import time
+import settings
 from bs4 import BeautifulSoup
 from fake_useragent import UserAgent
-import settings
+ROUND_COUNT=4
 
 
-def search_pattern(url, user_query):     
-    url_query = user_query.replace(' ', '%20')                     
-    new_url = ''.join([url, url_query])
-    return new_url
-
-
-def get_html(new_url):
+def get_html(url, message):
     ua = UserAgent()
-    headers = "'" + ua.random + "'"
-    html = requests.get(new_url, headers={'User-agent': headers}, timeout=10)
+    headers = f"'{ua.random}'"
+    html = requests.get(url, 
+                        params={"query" : message}, 
+                        headers={'User-agent': headers}, 
+                        timeout=10)
     return html
 
 
 def html_data(html):
     try:
-        s = ''
+        result = ''
         start_time = time.time()
-        counter = 0
         soup = BeautifulSoup(html.text, 'lxml')
-        for titles in soup.find_all("div", {"class":'ProductTizer plate teaser-item'}):
-            for title in titles.find("div", {"class":"title"}):
-                counter += 1
-            for raitings in titles.find(class_="average-rating").find('span'):
-                pass
-            for votes in titles.find(class_ = "read-all-reviews-link").find(class_ ="counter"):
-                pass
-            s += f'Название: {title.text}\nОценка: {raitings.text}\nГолосов: {votes.text}\n\n'
-        exec_time = round((time.time() - start_time), 4) 
-        res = '≥ 15' if counter >= 15 else counter  
-        return f'\n{s}\n----------------------------\nНайдено результатов {res}\n({exec_time}) сек.'
+        cards = soup.find_all("div", {"class":'ProductTizer plate teaser-item'})
+        for card in cards:
+            title = card.find("div", {"class":"title"}).find("a").text
+            raitings = card.find(class_ = "average-rating").find("span").text
+            votes = card.find(class_ = "read-all-reviews-link") \
+                        .find(class_ ="counter") \
+                        .text
+            result += f'Название: {title}\nОценка: {raitings}\nГолосов: {votes}\n\n'
+        exec_time = round((time.time() - start_time), ROUND_COUNT) 
+        res = '≥ 15' if len(cards) >= 15 else len(cards)  
+        return f'\n{result}\n----------------------------\nНайдено результатов {res}\n({exec_time}) сек.'
     except:
         print("Возникла ошибка.")
 
 
-token = settings.proxy
+token = settings.token
 
 bot = telebot.TeleBot(token)
 @bot.message_handler(content_types=['text'])
@@ -48,7 +45,7 @@ bot = telebot.TeleBot(token)
 
 def get_message(message):
     url = 'https://irecommend.ru/srch?query='
-    html = get_html(search_pattern(url, message.text))
+    html = get_html(url, message.text)
     if message.text == 'привет':
         bot.send_message(message.from_user.id, 'Привет, напиши название товара')
     elif message.text == '/help':
@@ -65,9 +62,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-    
-
-
-
-
-    
