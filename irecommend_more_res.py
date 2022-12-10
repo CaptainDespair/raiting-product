@@ -26,8 +26,9 @@ def html_data(html):
             votes = card.find(class_ = "read-all-reviews-link") \
                         .find(class_ ="counter") \
                         .text
-            result += f'Название: {title}\nОценка: {raitings}\nГолосов: {votes}\n\n'
-        exec_time = round((time.time() - start_time), ROUND_COUNT) 
+            stars = (round(float(raitings))) * '★'
+            result += f'{title}\n{stars} {raitings}\nГолосов: {votes}\n\n'
+        exec_time = round((time.time() - start_time), ROUND_COUNT)
         res = '≥ 15' if len(cards) >= 15 else len(cards)  
         return f'\n{result}\n----------------------------\nНайдено результатов {res}\n({exec_time}) сек.'
     except:
