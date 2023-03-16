@@ -1,4 +1,4 @@
-# taiting-product
+# raiting-product
 
 //в глобальном смысле проект закончен//
 telegrambot name: @RaitingIRecBot
